@@ -1,17 +1,19 @@
 # Just a quick manual job to get things up and running
 
-all: bin/html5rl
+CC = gcc
+CFLAGS = -Wall
 
-bin/html5rl: bin/html5rl.o
-	g++ bin/html5rl.o -o bin/html5rl
+OBJ = main.o html5.o
+INC = html5.h
+SM = html5.rl
 
-bin/html5rl.o: bin/html5rl.cpp
-	g++ -c bin/html5rl.cpp -o bin/html5rl.o
+html5: $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o html5
 
-bin/html5rl.cpp: cpp/src/html5rl.rl
-	ragel cpp/src/html5rl.rl -o bin/html5rl.cpp
+$(OBJ): $(INC)
 
-cpp/src/html5rl_cpp.rl: etc/html5parser.rl
+html5.c: html5.rl html5parser.rl
+	ragel html5.rl -o html5.c
 
 clean:
-	rm -f bin/html5rl bin/html5rl.o bin/html5rl.cpp
+	rm -f $(OBJ) html5.c html5
