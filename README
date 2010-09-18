@@ -1,0 +1,10 @@
+html5rl
+========
+
+A HTML5 parser mostly written in Ragel.
+
+The HTML5 specification:
+http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html
+
+By scribing the parser mostly in Ragel's abstract state machine language, hopefully we'll get a reasonably efficient HTML5 parser that is reusable in several languages. The HTML5 specification is complicated. The Ragel implementation is going to be ugly (think goto jumps everywhere). But I want to give it a go and see what falls out.
+
