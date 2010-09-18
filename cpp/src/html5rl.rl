@@ -8,7 +8,7 @@
 using namespace std;
 
 %% machine html5parser;
-%% include "html5parser.rl";
+%% include "../../etc/html5parser.rl";
 %% write data;
 
 int main(int argc, char** argv) {
