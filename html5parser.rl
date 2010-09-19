@@ -7,16 +7,16 @@
 machine html5parser;
 
 delim = 0x09 | 0x0A | 0x0C | 0x20;
-tag_delim = delim | [/>];
 
-open_tag = "<" alpha (any - tag_delim)*;
-close_tag = "</" alpha (any - tag_delim)*;
+tagchar = any - (delim | [/>]);
+opentag = "<" alpha tagchar*;
+closetag = "</" alpha tagchar*;
 
 main := |*
-	open_tag => {
+	opentag => {
 		openTag(s->ts + 1, s->te);
 	};
-	close_tag => {
+	closetag => {
 		closeTag(s->ts + 2, s->te);
 	};
 	any;
