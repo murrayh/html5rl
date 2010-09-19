@@ -5,16 +5,17 @@
 #include <stdio.h>
 #include "html5.h"
 
-void openTag(byte *s, byte *e) {
+#define starttag()	print("stag", s->ts + 1, s->te)
+#define endtag()	print("etag", s->ts + 2, s->te)
+#define attr()		print("attr", s->ts, s->te)
+
+void print(char *type, byte *s, byte *e) {
+	printf("%s:\t", type);
 	while (s != e) {
 		putc(*s, stdout);
 		++s;
 	}
 	putc('\n', stdout);
-}
-
-void closeTag(byte *s, byte *e) {
-	openTag(s, e);
 }
 
 %%{
@@ -30,7 +31,7 @@ void closeTag(byte *s, byte *e) {
 }%%
 
 void html5rl_init(rlstate *s) {
-	s->cs = 0;
+	%% write init;
 	s->eof = 0;
 	s->ts = 0;
 	s->te = 0;

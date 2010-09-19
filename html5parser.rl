@@ -9,17 +9,36 @@ machine html5parser;
 delim = 0x09 | 0x0A | 0x0C | 0x20;
 
 tagchar = any - (delim | [/>]);
-opentag = "<" alpha tagchar*;
-closetag = "</" alpha tagchar*;
+starttag = "<" alpha tagchar*;
+endtag = "</" alpha tagchar*;
 
-main := |*
-	opentag => {
-		openTag(s->ts + 1, s->te);
+in_body := |*
+	starttag => {
+		starttag();
+		fgoto in_attrs;
 	};
-	closetag => {
-		closeTag(s->ts + 2, s->te);
+	endtag => {
+		endtag();
+		fgoto in_attrs;
 	};
 	any;
 *|;
+
+in_attrs := |*
+	attrchar = any - (delim | [/>=]);
+
+	"/>" | ">" => {
+		fgoto in_body;
+	};
+	(attrchar | "=") attrchar* => {
+		attr();
+	};
+	any;
+*|;
+
+main := any @{
+	fhold;
+	fnext in_body;
+};
 
 }%%
