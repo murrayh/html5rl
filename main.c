@@ -12,7 +12,7 @@
 #define true 1
 
 int main(int argc, char** argv) {
-	const int BUFSIZE = 128;
+	static const int BUFSIZE = 1024;
 	byte buffer[BUFSIZE];
 
 	byte *bstart = buffer;
