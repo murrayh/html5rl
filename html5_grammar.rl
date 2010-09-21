@@ -50,7 +50,7 @@
 	) >token_start_tag_name %token_end;
 
 	tag = (
-		tag_name (space+ tag_attributes)? ('/' >token_self_close)? '>'
+		tag_name (space+ tag_attributes)? space* ('/' >token_self_close)? '>'
 	);
 
 	start_tag = ('<' (tag) >token_start_tag);
