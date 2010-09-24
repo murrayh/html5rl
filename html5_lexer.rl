@@ -13,6 +13,8 @@ char *END_TAG = "end tag";
 char *SELF_CLOSE = "self close";
 char *START_TAG = "start tag";
 char *ATTRIBUTE = "attribute";
+char *COMMENT = "comment";
+char *BOGUS_COMMENT = "bogus comment";
 char *VALUE = "value";
 char *TAG_NAME = "tag name";
 

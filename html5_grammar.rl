@@ -5,13 +5,15 @@
 
 	machine html5_grammar;
 
-	action token_end_tag		{ token(END_TAG); }
-	action token_self_close		{ token(SELF_CLOSE); }
-	action token_start_tag		{ token(START_TAG); }
-	action token_end		{ token_end(); }
-	action token_start_attribute	{ token_start(ATTRIBUTE); }
-	action token_start_value	{ token_start(VALUE); }
-	action token_start_tag_name	{ token_start(TAG_NAME); }
+	action token_end_tag			{ token(END_TAG); }
+	action token_self_close			{ token(SELF_CLOSE); }
+	action token_start_tag			{ token(START_TAG); }
+	action token_end			{ token_end(); }
+	action token_start_attribute		{ token_start(ATTRIBUTE); }
+	action token_start_bogus_comment	{ token_start(BOGUS_COMMENT); }
+	action token_start_comment		{ token_start(COMMENT); }
+	action token_start_value		{ token_start(VALUE); }
+	action token_start_tag_name		{ token_start(TAG_NAME); }
 
 	unquoted_value = (
 		(any - (space | ['">])) (any - (space | '>'))*
@@ -49,16 +51,43 @@
 		alpha (any - space - [/>])*
 	) >token_start_tag_name %token_end;
 
-	tag = (
-		tag_name (space+ tag_attributes)? space* ('/' >token_self_close)? '>'
+	tag_finish = (
+		(space+ tag_attributes)? space* ('/' >token_self_close)? '>'
 	);
+
+	tag = (tag_name tag_finish);
 
 	start_tag = ('<' (tag) >token_start_tag);
 
 	end_tag = ('</' (tag) >token_end_tag);
 
+	# this one is not going to work
+	# requires look ahead in to be able to parse '<!--------->' correctly
+	regular_comment = (
+		'<!--' (any*)
+			>token_start_comment
+			%token_end
+		:>> ('--' ('!' | (space+))? '>')
+	);
+
+	bogus_comment1 = (
+		'<?' (any*)
+			>token_start_bogus_comment
+			%token_end
+		:>> '>'
+	);
+
+	bogus_comment2 = (
+		'</' ( (any - (alpha | '>')) (any*) )
+			>token_start_bogus_comment
+			%token_end
+		:>> '>'
+	);
+
+	comment = (regular_comment | bogus_comment1 | bogus_comment2);
+
 	html5_document = (
-		start_tag | end_tag | (space+)
+		start_tag | end_tag | (space+) | comment
 	)**;
 
 }%%
