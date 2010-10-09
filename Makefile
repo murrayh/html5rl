@@ -1,18 +1,26 @@
 # Just a quick manual job to get things up and running
 
-CC = gcc
-CFLAGS = -Wall
+CC=gcc
+CFLAGS=-Wall -Wextra
+RAGEL=ragel
 
-OBJ = main.o html5.o
-INC = html5.h
+GEN=html5.c
+OBJ=html5.o main.o
+EXE=html5
 
-html5: $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o html5
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@
 
-$(OBJ): $(INC)
-
-html5.c: html5_lexer.rl html5_grammar.rl
-	ragel html5_lexer.rl -o html5.c
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+	
+$(GEN): html5_lexer.rl html5_grammar.rl html5.h
+	$(RAGEL) html5_lexer.rl -o $@
 
 clean:
-	rm -f $(OBJ) html5.c html5
+	$(RM) $(OBJ) $(GEN)
+
+clobber: clean
+	$(RM) $(EXE)
+
+.PHONY: clean clobber
