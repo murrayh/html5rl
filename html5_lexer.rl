@@ -5,26 +5,15 @@
 #include <stdio.h>
 #include "html5.h"
 
-#define token(t)	printf("token: %s\n", t)
-#define token_end()	printf("token end: "); print(val, s->p);
-#define token_start(t)	printf("token start: %s\n", t); val = s->p;
+#define SELF_CLOSE	1001
+#define TAG_NAME	1002
+#define EXTEND_PREVIOUS	1003
 
-char *END_TAG = "end tag";
-char *SELF_CLOSE = "self close";
-char *START_TAG = "start tag";
-char *ATTRIBUTE = "attribute";
-char *COMMENT = "comment";
-char *BOGUS_COMMENT = "bogus comment";
-char *VALUE = "value";
-char *TAG_NAME = "tag name";
-
-byte *val;
-void print(byte *s, byte *e) {
-	while (s != e) {
-		putc(*s++, stdout);
-	}
-	putc('\n', stdout);
-}
+#define token(t)	token.type = t; token.start = token.end = s->p;
+#define token_start(t)	token.start = s->p; \
+			if (token.type == UNKNOWN) token.type = t
+#define token_end()	token.end = s->p; token.complete = true; \
+			if (token.type == UNKNOWN) token.type = EXTEND_PREVIOUS
 
 %%{
 	machine html5_lexer;
@@ -47,16 +36,24 @@ void html5rl_init(rlstate *s) {
 	s->te = 0;
 }
 
-byte* html5rl_exec(rlstate *s, byte *p, byte *pe) {
+html5token html5rl_exec(rlstate *s, byte *p, byte *pe) {
+	/* Ragel setup */
 	s->p = p;
 	s->pe = pe;
 	s->te = p + (s->te - s->ts);
 	s->ts = p;
+	if (s->p == s->pe) {
+		s->eof = s->p;
+	}
+
+	/* Lexer setup */
+	html5token token;
+	token.type = UNKNOWN;
+	token.complete = false;
+	token.start = token.end = s->pe;
+
 	%% write exec;
-	return s->ts ? s->ts : s->pe;
+
+	return token;
 }
 
-void html5rl_eof(rlstate *s) {
-	s->eof = s->p = s->pe;
-	%% write exec;
-}

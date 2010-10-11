@@ -6,11 +6,10 @@
 	machine html5_grammar;
 
 	action token_end_tag			{ token(END_TAG); }
-	action token_self_close			{ token(SELF_CLOSE); }
+	action token_self_close			{ token(SELF_CLOSE); fbreak; }
 	action token_start_tag			{ token(START_TAG); }
-	action token_end			{ token_end(); }
+	action token_end			{ token_end(); fbreak; }
 	action token_start_attribute		{ token_start(ATTRIBUTE); }
-	action token_start_bogus_comment	{ token_start(BOGUS_COMMENT); }
 	action token_start_comment		{ token_start(COMMENT); }
 	action token_start_value		{ token_start(VALUE); }
 	action token_start_tag_name		{ token_start(TAG_NAME); }
@@ -72,14 +71,14 @@
 
 	bogus_comment1 = (
 		'<?' (any*)
-			>token_start_bogus_comment
+			>token_start_comment
 			%token_end
 		:>> '>'
 	);
 
 	bogus_comment2 = (
 		'</' ( (any - (alpha | '>')) (any*) )
-			>token_start_bogus_comment
+			>token_start_comment
 			%token_end
 		:>> '>'
 	);

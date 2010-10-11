@@ -7,42 +7,77 @@
 #include <string.h>
 #include "html5.h"
 
-#define bool int
-#define false 0
-#define true 1
+void print_token(html5token token);
+void print_bytes(byte *start, byte *end);
 
 int main(int argc, char** argv) {
 	static const int BUFSIZE = 1024;
 	byte buffer[BUFSIZE];
 
-	byte *bstart = buffer;
-	byte *bend = buffer + BUFSIZE;
 	byte *start;
-	byte *end = bstart;
+	byte *end;
 	size_t count;
 
 	rlstate s;
+	html5token token;
 	html5rl_init(&s);
 
 	bool done = false;
 	while (!done) {
-		count = fread(bstart, sizeof(byte), bend - end, stdin);
+		count = fread(buffer, sizeof(byte), BUFSIZE, stdin);
 		if (count <= 0) {
-			html5rl_eof(&s);
+			html5rl_exec(&s, NULL, NULL);
 			done = true;
 		} else {
-			end += count;
-			start = html5rl_exec(&s, bstart, end);
-			memmove(bstart, start, end - start);
-			end -= (start - bstart);
-
-			if (end == bend) {
-				fprintf(stderr, "CURRENT TOKEN TOO BIG\n");
-				done = true;
+			start = buffer;
+			end = buffer + count;
+			do
+			{
+				token = html5rl_exec(&s, start, end);
+				start = token.end;
+				print_token(token);
 			}
+			while (token.end != end);
 		}
 	}
 
 	return 0;
 }
 
+bool first = true;
+char indent[20] = { '\0' };
+void print_token(html5token token) {
+	switch (token.type) {
+	case START_TAG:
+		if (first) {
+			first = false;
+		} else {
+			putc('\n', stdout);
+		}
+		printf("%s<", indent);
+		print_bytes(token.start, token.end);
+		putc('>', stdout);
+		strcat(indent, "  ");
+		break;
+	
+	case ATTRIBUTE:
+		printf("\n%s", indent);
+		print_bytes(token.start, token.end);
+		break;
+
+	case VALUE:
+		putc('=', stdout);
+		print_bytes(token.start, token.end);
+		break;
+
+	default:
+		printf("\nhere %d, %d\n", token.type, token.end - token.start);
+		break;
+	}
+}
+
+void print_bytes(byte *start, byte *end) {
+	while (start != end) {
+		putc(*start++, stdout);
+	}
+}
