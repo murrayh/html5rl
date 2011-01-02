@@ -23,4 +23,7 @@ clean:
 clobber: clean
 	$(RM) $(EXE)
 
+%.png: html5_grammar.rl
+	$(RAGEL) -p -V -M $(@:.png=) html5_grammar.rl | dot -Tpng > $@
+
 .PHONY: clean clobber
