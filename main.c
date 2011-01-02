@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 			do
 			{
 				token = html5rl_exec(&s, start, end);
-				start = token.end;
+				start = s.p;
 				print_token(token);
 			}
 			while (token.end != end);
@@ -60,6 +60,18 @@ void print_token(html5token token) {
 		strcat(indent, "  ");
 		break;
 	
+	case END_TAG:
+		if (first) {
+			first = false;
+		} else {
+			putc('\n', stdout);
+		}
+		printf("%s</", indent);
+		print_bytes(token.start, token.end);
+		putc('>', stdout);
+		strcat(indent, "  ");
+		break;
+	
 	case ATTRIBUTE:
 		printf("\n%s", indent);
 		print_bytes(token.start, token.end);
@@ -68,6 +80,12 @@ void print_token(html5token token) {
 	case VALUE:
 		putc('=', stdout);
 		print_bytes(token.start, token.end);
+		break;
+	
+	case COMMENT:
+		printf("\n%s<!-- ", indent);
+		print_bytes(token.start, token.end);
+		printf(" -->");
 		break;
 
 	default:
