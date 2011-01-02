@@ -43,18 +43,18 @@
 	) >token_start_attribute %token_end;
 
 	tag_attributes = (
-		attribute space* (('=' space* value) $1)? space*
+		(attribute space*)
+		| (attribute space* '=' space* (value space*)?)
+		| ('/' >token_self_close) 
 	)**;
 
 	tag_name =  (
-		alpha (any - space - [/>])*
+		alpha (any - (space | [/>]))*
 	) >token_start_tag_name %token_end;
 
-	tag_finish = (
-		(space+ tag_attributes)? space* ('/' >token_self_close)? '>'
+	tag = (
+		tag_name :> space* tag_attributes '>'
 	);
-
-	tag = (tag_name tag_finish);
 
 	start_tag = ('<' (tag) >token_start_tag);
 
