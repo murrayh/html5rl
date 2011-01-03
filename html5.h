@@ -8,12 +8,13 @@
 	#define false 0
 #endif
 
-#define UNKNOWN		0
+#define EXTEND_PREVIOUS	0
 #define START_TAG	1
 #define END_TAG		2
-#define ATTRIBUTE	3
-#define VALUE		4
-#define COMMENT		5
+#define SELF_CLOSE	3
+#define ATTRIBUTE	4
+#define VALUE		5
+#define COMMENT		6
 
 typedef struct rlstate {
 	int cs;		// current state

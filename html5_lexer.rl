@@ -5,16 +5,13 @@
 #include <stdio.h>
 #include "html5.h"
 
-#define SELF_CLOSE	1001
-#define EXTEND_PREVIOUS	1003
-
 #define token(t)					\
 	token.type = t;					\
 	token.start = token.end = s->p;
 
 #define token_start(t)					\
-	token.start = s->p;				\
-	token.type = t;
+	token.type = t;					\
+	token.start = s->p;
 
 #define token_might_end()				\
 	for (i = 0; i < 4 - 1; ++i) {			\
@@ -24,17 +21,11 @@
 
 #define token_end_2chars()				\
 	token.end = token_ends[1];			\
-	token.complete = true;				\
-	if (token.type == UNKNOWN) {			\
-		token.type = EXTEND_PREVIOUS;		\
-	}
+	token.complete = true;
 
 #define token_end()					\
 	token.end = s->p;				\
-	token.complete = true;				\
-	if (token.type == UNKNOWN) {			\
-		token.type = EXTEND_PREVIOUS;		\
-	}
+	token.complete = true;
 
 %%{
 	machine html5_lexer;
@@ -73,9 +64,9 @@ html5token html5rl_exec(rlstate *s, byte *p, byte *pe) {
 
 	/* Lexer setup */
 	html5token token;
-	token.type = UNKNOWN;
+	token.type = EXTEND_PREVIOUS;
 	token.complete = false;
-	token.start = token.end = s->pe;
+	token.start = token.end = s->p;
 
 	%% write exec;
 
