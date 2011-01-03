@@ -15,7 +15,6 @@
 	action token_start_attribute		{ token_start(ATTRIBUTE); }
 	action token_start_comment		{ token_start(COMMENT); }
 	action token_start_value		{ token_start(VALUE); }
-	action token_start_tag_name		{ token_start(TAG_NAME); }
 
 	unquoted_value = (
 		(any - (space | ['">])) (any - (space | '>'))*
@@ -54,10 +53,10 @@
 
 	tag_name =  (
 		alpha (any - (space | [/>]))*
-	) >token_start_tag_name %token_end;
+	) %token_end;
 
 	tag = (
-		tag_name :> space* tag_attributes '>'
+		tag_name <: space* tag_attributes '>'
 	);
 
 	start_tag = ('<' (tag) >token_start_tag);

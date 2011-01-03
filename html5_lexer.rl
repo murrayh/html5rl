@@ -6,7 +6,6 @@
 #include "html5.h"
 
 #define SELF_CLOSE	1001
-#define TAG_NAME	1002
 #define EXTEND_PREVIOUS	1003
 
 #define token(t)					\
@@ -15,9 +14,7 @@
 
 #define token_start(t)					\
 	token.start = s->p;				\
-	if (token.type == UNKNOWN) {			\
-		token.type = t;				\
-	}
+	token.type = t;
 
 #define token_might_end()				\
 	for (i = 0; i < 4 - 1; ++i) {			\
