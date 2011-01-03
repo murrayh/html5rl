@@ -9,11 +9,35 @@
 #define TAG_NAME	1002
 #define EXTEND_PREVIOUS	1003
 
-#define token(t)	token.type = t; token.start = token.end = s->p;
-#define token_start(t)	token.start = s->p; \
-			if (token.type == UNKNOWN) token.type = t
-#define token_end()	token.end = s->p; token.complete = true; \
-			if (token.type == UNKNOWN) token.type = EXTEND_PREVIOUS
+#define token(t)					\
+	token.type = t;					\
+	token.start = token.end = s->p;
+
+#define token_start(t)					\
+	token.start = s->p;				\
+	if (token.type == UNKNOWN) {			\
+		token.type = t;				\
+	}
+
+#define token_might_end()				\
+	for (i = 0; i < 4 - 1; ++i) {			\
+		token_ends[i+1] = token_ends[i];	\
+	}						\
+	token_ends[0] = s->p;
+
+#define token_end_2chars()				\
+	token.end = token_ends[1];			\
+	token.complete = true;				\
+	if (token.type == UNKNOWN) {			\
+		token.type = EXTEND_PREVIOUS;		\
+	}
+
+#define token_end()					\
+	token.end = s->p;				\
+	token.complete = true;				\
+	if (token.type == UNKNOWN) {			\
+		token.type = EXTEND_PREVIOUS;		\
+	}
 
 %%{
 	machine html5_lexer;
@@ -46,6 +70,10 @@ html5token html5rl_exec(rlstate *s, byte *p, byte *pe) {
 		s->eof = s->p;
 	}
 
+	/* Local vars */
+	int i;
+	byte *token_ends[4];
+
 	/* Lexer setup */
 	html5token token;
 	token.type = UNKNOWN;
@@ -53,6 +81,20 @@ html5token html5rl_exec(rlstate *s, byte *p, byte *pe) {
 	token.start = token.end = s->pe;
 
 	%% write exec;
+
+	if (s->cs == html5_lexer_error) {
+		fprintf(stderr, "### Parse error : '");
+		byte *p = s->p;
+		while (p != s->pe) {
+			if (*p == '\n') {
+				fprintf(stderr, "\\n");
+			} else {
+				fprintf(stderr, "%c", *p);
+			}
+			++p;
+		}
+		fprintf(stderr, "'\n");
+	}
 
 	return token;
 }

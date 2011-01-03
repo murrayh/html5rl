@@ -5,10 +5,13 @@
 
 	machine html5_grammar;
 
+	action fhold				{ fhold; }
 	action token_end_tag			{ token(END_TAG); }
-	action token_self_close			{ token(SELF_CLOSE); fbreak; }
+	action token_self_close			{ token(SELF_CLOSE); fhold; fbreak; }
 	action token_start_tag			{ token(START_TAG); }
+	action token_might_end			{ token_might_end(); }
 	action token_end			{ token_end(); fbreak; }
+	action token_end_2chars			{ token_end_2chars(); }
 	action token_start_attribute		{ token_start(ATTRIBUTE); }
 	action token_start_comment		{ token_start(COMMENT); }
 	action token_start_value		{ token_start(VALUE); }
@@ -45,7 +48,8 @@
 	tag_attributes = (
 		(attribute space*)
 		| (attribute space* '=' space* (value space*)?)
-		| ('/' >token_self_close) 
+		| ('/' [^>] >fhold)
+		| ('/>' @token_self_close) 
 	)**;
 
 	tag_name =  (
@@ -60,14 +64,12 @@
 
 	end_tag = ('</' (tag) >token_end_tag);
 
-	# this one is not going to work
-	# requires look ahead in to be able to parse '<!--------->' correctly
 	regular_comment = (
 		'<!--' (any*)
 			>token_start_comment
-			%token_end
+			%token_might_end
 		:>> ('--' ('!' | (space+))? '>')
-	);
+	) %token_end_2chars;
 
 	bogus_comment1 = (
 		'<?' (any*)
