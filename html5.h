@@ -28,7 +28,7 @@ typedef struct rlstate {
 typedef struct html5token {
 	int type;
 	bool complete;
-	char *start;
+	byte *start;
 	byte *end;
 } html5token;
 
