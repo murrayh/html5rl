@@ -71,20 +71,27 @@
 	) %token_end_2chars;
 
 	bogus_comment1 = (
-		'<?' (any*)
+		'<!' (any* - ('DOCTYPE' any*) - ('--' any*))
 			>token_start_comment
 			%token_end
 		:>> '>'
 	);
 
 	bogus_comment2 = (
+		'<?' (any*)
+			>token_start_comment
+			%token_end
+		:>> '>'
+	);
+
+	bogus_comment3 = (
 		'</' ( (any - (alpha | '>')) (any*) )
 			>token_start_comment
 			%token_end
 		:>> '>'
 	);
 
-	comment = (regular_comment | bogus_comment1 | bogus_comment2);
+	comment = (regular_comment | bogus_comment1 | bogus_comment2 | bogus_comment3);
 
 	html5_document = (
 		start_tag | end_tag | (space+) | comment
