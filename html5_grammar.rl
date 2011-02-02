@@ -71,8 +71,8 @@
 		'<!--' (any*)
 			>start_token_comment
 			%might_end_token
-		:>> ('--' ('!' | (space+))? '>')
-	) %end_token_2chars;
+		:>> ('--' ('!' | (space+))? ('>' >end_token_2chars))
+	);
 
 	bogus_comment1 = (
 		'<!' (any* - ('DOCTYPE' any*) - ('--' any*))
