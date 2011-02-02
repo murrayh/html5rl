@@ -1,3 +1,6 @@
+#ifndef HTML5RL_INCLUDE_HTML5RL_H
+#define HTML5RL_INCLUDE_HTML5RL_H
+
 #ifndef byte
 	#define byte char
 #endif
@@ -15,6 +18,10 @@
 #define ATTRIBUTE	4
 #define VALUE		5
 #define COMMENT		6
+#define DOCTYPE		7
+#define DOCTYPE_NAME	8
+#define DOCTYPE_PUBLIC	9
+#define DOCTYPE_SYSTEM	10
 
 typedef struct rlstate {
 	int cs;		// current state
@@ -35,3 +42,6 @@ typedef struct html5token {
 
 void html5rl_init(rlstate *s);
 html5token html5rl_exec(rlstate *s, byte *start, byte *end);
+
+#endif // HTML5RL_INCLUDE_HTML5RL_H
+

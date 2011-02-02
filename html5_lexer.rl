@@ -9,21 +9,21 @@
 	token.type = t;					\
 	token.start = token.end = s->p;
 
-#define token_start(t)					\
+#define start_token(t)					\
 	token.type = t;					\
 	token.start = s->p;
 
-#define token_might_end()				\
+#define might_end_token()				\
 	for (i = 0; i < 4 - 1; ++i) {			\
 		token_ends[i+1] = token_ends[i];	\
 	}						\
 	token_ends[0] = s->p;
 
-#define token_end_2chars()				\
+#define end_token_2chars()				\
 	token.end = token_ends[1];			\
 	token.complete = true;
 
-#define token_end()					\
+#define end_token()					\
 	token.end = s->p;				\
 	token.complete = true;
 
