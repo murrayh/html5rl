@@ -32,6 +32,7 @@ if testdata:
 	testdatas.append(testdata)
 
 
+i = 0;
 for testdata in testdatas:
 	proc = subprocess.Popen('../html5',
 			shell=True,
@@ -39,6 +40,13 @@ for testdata in testdatas:
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE,
 			)
-
+	print '---'
+	print 'Test %d' % i
+	print 'Input:'
+	print ''.join(testdata[data]), 
+	print 'Expected:'
+	print ''.join(testdata[document]),
+	print 'Output:'
 	out, err = proc.communicate(''.join(testdata[data]))
-	print out
+	print out,
+	i = i + 1
