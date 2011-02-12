@@ -25,6 +25,6 @@ clobber: clean
 	$(RM) *.png
 
 %.png: html5_grammar.rl
-	$(RAGEL) -p -V -M $(@:.png=) html5_grammar.rl | sed 's/label = "DEF/color = "red", label = "DEF/g' | dot -Tpng > $@
+	$(RAGEL) -p -V -M $(@:.png=) html5_grammar.rl | dot -Tpng > $@
 
 .PHONY: clean clobber
