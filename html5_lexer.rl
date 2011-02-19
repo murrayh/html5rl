@@ -29,7 +29,8 @@
 
 %%{
 	machine html5_lexer;
-	include html5_grammar "html5_grammar.rl";
+	include html5_grammar "html5_tokens.rl";
+	alphtype unsigned char;
 
 	main := html5_document;
 

@@ -7,6 +7,7 @@ RAGEL=ragel
 GEN=html5.c
 OBJ=html5.o main.o
 EXE=html5
+RL=html5_lexer.rl html5_tokens.rl html5_names.rl
 
 $(EXE): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@
@@ -14,7 +15,7 @@ $(EXE): $(OBJ)
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 	
-$(GEN): html5_lexer.rl html5_grammar.rl html5.h
+$(GEN): $(RL) html5.h
 	$(RAGEL) html5_lexer.rl -o $@
 
 clean:
@@ -24,7 +25,7 @@ clobber: clean
 	$(RM) $(EXE)
 	$(RM) *.png
 
-%.png: html5_grammar.rl
-	$(RAGEL) -p -V -M $(@:.png=) html5_grammar.rl | dot -Tpng > $@
+%.png: $(RL)
+	$(RAGEL) -p -V -M $(@:.png=) html5_lexer.rl | dot -Tpng > $@
 
 .PHONY: clean clobber
