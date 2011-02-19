@@ -51,7 +51,7 @@ attribute = (
 
 attributes = (
 	( attribute uspc* )
-	| ( attribute uspc* ueq space* ( value uspc* )? )
+	| ( attribute uspc* ueq uspc* ( value uspc* )? )
 	| ( ufslash ^ugt >fhold )
 	| ( ufslash ugt @token_self_close ) 
 )**;
@@ -117,37 +117,53 @@ doctype_double_quoted_value = (
 	:>> udqt
 );
 
-doctype_quoted_value = (
+doctype_quoted_value_ext = (
 	doctype_single_quoted_value
 	| doctype_double_quoted_value
 );
 
-doctype_name = (
-	uspc+ ( uchar - ugt - uspc )+
+doctype_quoted_value = (
+	( uspc+ doctype_quoted_value_ext )
+	| ( doctype_quoted_value_ext >pe )
+);
+
+doctype_name_ext = (
+	( uchar - ugt - uspc )+
 		>start_token_doctype_name
 		%end_token
 );
 
+doctype_name = (
+	( uspc+ doctype_name_ext )
+	| ( doctype_name_ext >pe )
+);
+
+doctype_public_ext = (
+	npublic %token_doctype_public doctype_quoted_value
+);
+
 doctype_public = (
-	uspc+ 'PUBLIC'
-		%token_doctype_public
-	uspc+ doctype_quoted_value
+	( uspc+ doctype_public_ext )
+	| ( doctype_public_ext >pe )
+);
+
+doctype_system_ext = (
+	nsystem %token_doctype_system doctype_quoted_value
 );
 
 doctype_system = (
-	uspc+ 'SYSTEM'
-		%token_doctype_system
-	uspc+ doctype_quoted_value
+	( uspc+ doctype_system_ext )
+	| ( doctype_system_ext >pe )
 );
 
 doctype_attributes = (
-	doctype_name doctype_public? doctype_system? space*
+	doctype_name <: doctype_public? doctype_system?
 ) <>^pe;
 
 doctype = (
 	ult ubang ndoctype
 		%token_doctype
-	space* ( ^ugt* | doctype_attributes )? <: ( ^ugt+ >pe )? ugt
+	uspc* ( doctype_attributes | ^ugt+ )? uspc* <: ( ^ugt+ >pe )? ugt
 );
 
 html5_document = (
